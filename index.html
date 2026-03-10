@@ -3,608 +3,742 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Adecco Pilot · SoftwareONE</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<title>Adecco Pilot Dashboard · SoftwareONE</title>
 <style>
-:root{
-  --ink:#0A1628; --teal:#0891B2; --mint:#06B6D4; --sky:#E0F2FE;
-  --bg:#F8FAFC; --card:#FFFFFF; --border:#E2E8F0; --muted:#64748B;
-  --nav:#0D1F35; --nav2:#132337;
-  --p1:#DC2626; --p1l:#FEF2F2;
-  --p2:#EA580C; --p2l:#FFF7ED;
-  --p3:#CA8A04; --p3l:#FEFCE8;
-  --p4:#16A34A; --p4l:#F0FDF4;
-  --ok:#16A34A; --okl:#F0FDF4;
-  --am:#D97706; --aml:#FFFBEB;
-  --rd:#DC2626; --rdl:#FEF2F2;
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F0F4F8;color:#0D1B2A;font-size:13px;line-height:1.5;}
+.hdr{background:#0D1B2A;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-bottom:3px solid #028090;}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.hdr-logo{width:36px;height:36px;background:#028090;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;letter-spacing:-0.5px;flex-shrink:0;}
+.hdr h1{font-size:1.05rem;font-weight:700;color:#fff;}
+.hdr p{font-size:.72rem;color:#00B4CC;margin-top:1px;}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.date-box{background:#132337;border:1px solid #1E3A5F;border-radius:7px;padding:6px 12px;}
+.date-box label{font-size:.65rem;color:#5A8FAF;text-transform:uppercase;letter-spacing:.06em;font-weight:700;display:block;margin-bottom:2px;}
+.date-box input{background:transparent;border:none;color:#00B4CC;font-size:.8rem;font-weight:600;font-family:'Courier New',monospace;cursor:pointer;outline:none;width:122px;}
+.day-pill{background:#028090;color:#fff;padding:7px 14px;border-radius:7px;font-size:.78rem;font-weight:700;white-space:nowrap;font-family:'Courier New',monospace;}
+.tabs{background:#0D1B2A;border-bottom:1px solid #1E3A5F;display:flex;overflow-x:auto;padding:0 20px;}
+.tab{padding:11px 18px;color:#5A8FAF;font-size:.82rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;white-space:nowrap;user-select:none;}
+.tab:hover{color:#fff;}.tab.on{color:#00B4CC;border-bottom-color:#00B4CC;}
+.panel{display:none;padding:20px 22px 32px;}.panel.on{display:block;}
 
-/* TOPBAR */
-.topbar{background:var(--nav);border-bottom:2px solid var(--teal);padding:0 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;min-height:62px;}
-.brand{display:flex;align-items:center;gap:12px;padding:12px 0;}
-.logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--teal),var(--mint));display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;letter-spacing:-1px;flex-shrink:0;}
-.brand-text h1{font-size:.98rem;font-weight:600;color:#fff;line-height:1.2;}
-.brand-text p{font-size:.7rem;color:#94A3B8;margin-top:1px;}
-.topbar-r{display:flex;align-items:center;gap:10px;padding:12px 0;flex-wrap:wrap;}
-.dp{background:var(--nav2);border:1px solid #1E3A5F;border-radius:8px;padding:5px 12px;}
-.dp label{display:block;font-size:.6rem;font-weight:700;color:var(--mint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;}
-.dp input[type=date]{background:transparent;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:.79rem;font-weight:500;cursor:pointer;outline:none;width:118px;}
-.dp input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
-.badge{background:var(--teal);color:#fff;padding:6px 14px;border-radius:8px;font-size:.78rem;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap;}
+/* UPLOAD GRID */
+.up-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:20px;}
+@media(max-width:600px){.up-grid{grid-template-columns:1fr;}}
+.upload{border:2px dashed #B0C4D8;border-radius:10px;background:#fff;text-align:center;padding:20px 16px;cursor:pointer;transition:all .2s;position:relative;}
+.upload:hover,.upload.drag{border-color:#028090;background:#F0FBFC;}
+.upload input{display:none;}
+.up-ico{font-size:1.6rem;margin-bottom:4px;}
+.up-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+.up-tag.t{background:#E0F2FE;color:#0369A1;}.up-tag.s{background:#F0FDF4;color:#166534;}
+.upload h3{font-size:.85rem;font-weight:700;color:#0D1B2A;margin-bottom:3px;}
+.upload p{font-size:.72rem;color:#64748B;margin-bottom:8px;}
+.upload-btn{display:inline-block;background:#028090;color:#fff;padding:6px 14px;border-radius:6px;font-size:.75rem;font-weight:700;}
+.up-cols{font-size:.65rem;color:#94A3B8;margin-top:6px;font-family:'Courier New',monospace;line-height:1.6;}
+.up-done{font-size:.8rem;font-weight:600;color:#028090;padding:4px 0;}
+.up-done span{color:#64748B;font-weight:400;font-size:.72rem;}
+.up-status{position:absolute;top:10px;right:10px;width:10px;height:10px;border-radius:50%;background:#E2E8F0;}
+.up-status.ok{background:#16A34A;}.up-status.wait{background:#F59E0B;}
 
-/* TABS */
-.tabbar{background:#0D1F35;border-bottom:1px solid #1E3A5F;display:flex;overflow-x:auto;padding:0 28px;gap:0;}
-.tab{padding:13px 18px;font-size:.8rem;font-weight:500;color:#475569;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;transition:all .15s;letter-spacing:.01em;}
-.tab:hover{color:#94A3B8;}.tab.on{color:var(--mint);border-bottom-color:var(--mint);font-weight:600;}
+/* INFO */
+.info{background:#E0F7FA;border-left:4px solid #028090;border-radius:0 8px 8px 0;padding:9px 14px;font-size:.78rem;color:#0D3B44;margin-bottom:18px;}
+.info b{color:#028090;}
+.warn{background:#FFF8E1;border-left:4px solid #F59E0B;border-radius:0 8px 8px 0;padding:9px 14px;font-size:.78rem;color:#5C3D00;margin-bottom:14px;}
 
-/* PANELS */
-.panel{display:none;padding:28px 28px 56px;}.panel.on{display:block;}
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px;margin-bottom:20px;}
+.kpi{background:#fff;border-radius:9px;padding:14px 15px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-top:3px solid #028090;}
+.kpi.r{border-top-color:#DC2626;}.kpi.a{border-top-color:#F59E0B;}.kpi.g{border-top-color:#16A34A;}.kpi.b{border-top-color:#2563EB;}
+.kpi-val{font-size:1.9rem;font-weight:800;color:#0D1B2A;line-height:1;font-family:'Courier New',monospace;}
+.kpi-lbl{font-size:.7rem;color:#64748B;margin-top:4px;text-transform:uppercase;letter-spacing:.04em;}
+.kpi-sub{font-size:.69rem;color:#028090;margin-top:2px;font-weight:600;}
 
-/* UPLOAD */
-.upzone{border:2px dashed var(--border);border-radius:14px;background:var(--card);text-align:center;padding:52px 24px;cursor:pointer;transition:all .2s;margin-bottom:28px;}
-.upzone:hover,.upzone.drag{border-color:var(--teal);background:var(--sky);}
-.upzone input{display:none;}
-.upzone .ico{font-size:3rem;margin-bottom:10px;}
-.upzone strong{font-size:1.05rem;font-weight:600;}
-.upzone p{font-size:.79rem;color:var(--muted);margin-top:6px;max-width:380px;margin-inline:auto;}
-.up-btn{display:inline-block;margin-top:14px;background:var(--teal);color:#fff;padding:9px 22px;border-radius:8px;font-size:.81rem;font-weight:600;}
-
-/* EMPTY */
-.empty{text-align:center;padding:80px 20px;color:var(--muted);}
-.empty .ei{font-size:3.5rem;margin-bottom:14px;}
-.empty h3{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
-
-/* FILE PILL */
-.fpill{display:flex;align-items:center;gap:8px;background:var(--sky);border:1px solid var(--teal);border-radius:8px;padding:8px 14px;margin-bottom:22px;font-size:.79rem;}
-.fpill b{color:var(--teal);}
-.fpill button{margin-left:auto;background:none;border:1px solid var(--teal);color:var(--teal);padding:3px 10px;border-radius:5px;cursor:pointer;font-size:.73rem;font-weight:600;font-family:'DM Sans',sans-serif;}
-
-/* KPI GRID */
-.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:14px;margin-bottom:28px;}
-.kpi{background:var(--card);border-radius:12px;padding:18px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);border-top:3px solid var(--teal);position:relative;overflow:hidden;}
-.kpi::after{content:'';position:absolute;top:-14px;right:-14px;width:56px;height:56px;border-radius:50%;background:var(--teal);opacity:.06;}
-.kpi.rd{border-top-color:var(--rd);}.kpi.rd::after{background:var(--rd);}
-.kpi.am{border-top-color:var(--am);}.kpi.am::after{background:var(--am);}
-.kpi.ok{border-top-color:var(--ok);}.kpi.ok::after{background:var(--ok);}
-.kpi.nt{border-top-color:var(--muted);}.kpi.nt::after{background:var(--muted);}
-.kpi .v{font-size:2rem;font-weight:700;font-family:'DM Mono',monospace;line-height:1;}
-.kpi .l{font-size:.7rem;color:var(--muted);margin-top:5px;font-weight:500;}
-.kpi .s{font-size:.67rem;color:var(--teal);margin-top:2px;font-weight:600;}
-.kpi.rd .s{color:var(--rd);}.kpi.am .s{color:var(--am);}.kpi.ok .s{color:var(--ok);}
-
-/* SECTION HEADING */
-.sh{font-size:.86rem;font-weight:700;margin:26px 0 12px;padding-left:11px;border-left:3px solid var(--teal);}
+/* SECTION */
+.sec{font-size:.75rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.07em;margin:20px 0 9px;padding-left:8px;border-left:3px solid #028090;}
 
 /* GRIDS */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:22px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:22px;}
-@media(max-width:900px){.g2,.g3{grid-template-columns:1fr 1fr;}}
-@media(max-width:580px){.g2,.g3{grid-template-columns:1fr;}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:16px;}
+@media(max-width:860px){.g2,.g3{grid-template-columns:1fr 1fr;}}
+@media(max-width:560px){.g2,.g3{grid-template-columns:1fr;}}
 
 /* CARD */
-.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);}
-.card h3{font-size:.81rem;font-weight:700;margin-bottom:14px;}
-.card canvas{max-height:210px;}
+.card{background:#fff;border-radius:9px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.card h3{font-size:.75rem;font-weight:700;color:#64748B;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;}
 
-/* PROGRESS BARS */
-.pbwrap{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);margin-bottom:18px;}
-.pbwrap h3{font-size:.81rem;font-weight:700;margin-bottom:16px;}
-.pb{margin-bottom:16px;}.pb:last-child{margin-bottom:0;}
-.pbtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
-.pbl{font-size:.79rem;font-weight:600;}.pbm{font-size:.71rem;color:var(--muted);}
-.pbtrack{height:8px;background:#E2E8F0;border-radius:99px;overflow:hidden;}
-.pbfill{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1);}
-.pbpct{font-size:.71rem;font-weight:700;margin-top:3px;text-align:right;}
+/* BAR CHART */
+.bar-chart{display:flex;flex-direction:column;gap:8px;}
+.bc-row{display:flex;align-items:center;gap:8px;}
+.bc-lbl{font-size:.76rem;color:#0D1B2A;width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bc-track{flex:1;background:#E2E8F0;border-radius:3px;height:8px;overflow:hidden;}
+.bc-fill{height:100%;border-radius:3px;}
+.bc-val{font-size:.73rem;font-weight:700;color:#0D1B2A;width:36px;text-align:right;font-family:'Courier New',monospace;}
 
-/* SLA TARGET CARDS */
-.slacards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:22px;}
-.slac{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:4px solid;}
-.slac.s1{border-left-color:var(--p1);}.slac.s2{border-left-color:var(--p2);}
-.slac.s3{border-left-color:var(--p3);}.slac.s4{border-left-color:var(--p4);}
-.slac .sbadge{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
-.slac.s1 .sbadge{color:var(--p1);}.slac.s2 .sbadge{color:var(--p2);}
-.slac.s3 .sbadge{color:var(--p3);}.slac.s4 .sbadge{color:var(--p4);}
-.slac .sdesc{font-size:.78rem;font-weight:600;color:var(--ink);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:10px;line-height:1.4;}
-.srow{display:flex;justify-content:space-between;font-size:.75rem;padding:3px 0;}
-.srow .sk{color:var(--muted);}.srow .sv{font-weight:600;}
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.donut-legend{display:flex;flex-direction:column;gap:6px;flex:1;}
+.dl-row{display:flex;align-items:center;gap:6px;font-size:.76rem;}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.dl-label{color:#0D1B2A;flex:1;}
+.dl-val{font-weight:700;color:#0D1B2A;font-family:'Courier New',monospace;}
+
+/* SLA BARS */
+.sla-bar-row{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.sla-lbl{width:110px;flex-shrink:0;font-size:.78rem;font-weight:600;}
+.sla-type{width:80px;flex-shrink:0;font-size:.68rem;color:#64748B;}
+.sla-target{width:65px;flex-shrink:0;font-size:.67rem;color:#94A3B8;font-family:'Courier New',monospace;}
+.sla-track{flex:1;background:#E2E8F0;border-radius:3px;height:7px;overflow:hidden;}
+.sla-fill{height:100%;border-radius:3px;}
+.sla-pct{width:42px;text-align:right;font-size:.78rem;font-weight:700;font-family:'Courier New',monospace;}
+.sla-cnt{font-size:.7rem;color:#94A3B8;margin-left:4px;width:40px;}
 
 /* TABLE */
-.tblwrap{background:var(--card);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);overflow:hidden;margin-bottom:22px;overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:.78rem;}
-thead tr{background:var(--ink);}
-thead th{padding:10px 13px;text-align:left;font-weight:600;color:#94A3B8;white-space:nowrap;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;}
-tbody tr{border-bottom:1px solid #F1F5F9;transition:background .1s;}
-tbody tr:hover{background:#F0F9FF;}
-tbody td{padding:8px 13px;vertical-align:middle;}
+.tbl-wrap{background:#fff;border-radius:9px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;overflow-x:auto;margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;font-size:.79rem;}
+thead th{background:#0D1B2A;color:#fff;padding:9px 11px;text-align:left;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+tbody tr{border-bottom:1px solid #F1F5F9;transition:background .15s;}
+tbody tr:hover{background:#F8FCFD;}
 tbody tr:last-child{border-bottom:none;}
+tbody td{padding:8px 11px;vertical-align:middle;}
 
 /* PILLS */
-.pill{display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;font-size:.68rem;font-weight:700;letter-spacing:.02em;white-space:nowrap;}
-.pp1{background:var(--p1l);color:var(--p1);}.pp2{background:var(--p2l);color:var(--p2);}
-.pp3{background:var(--p3l);color:var(--p3);}.pp4{background:var(--p4l);color:var(--p4);}
-.pok{background:var(--okl);color:var(--ok);}.pam{background:var(--aml);color:var(--am);}
-.prd{background:var(--rdl);color:var(--rd);}.pbl{background:#EFF6FF;color:#2563EB;}
-.pgr{background:#F1F5F9;color:var(--muted);}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.69rem;font-weight:700;white-space:nowrap;}
+.pp1{background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;}
+.pp2{background:#FFF7ED;color:#9A3412;border:1px solid #FDBA74;}
+.pp3{background:#FEFCE8;color:#854D0E;border:1px solid #FDE047;}
+.pp4{background:#F0FDF4;color:#166534;border:1px solid #86EFAC;}
+.pg{background:#F0FDF4;color:#166534;border:1px solid #86EFAC;}
+.pa{background:#FFFBEB;color:#92400E;border:1px solid #FCD34D;}
+.pr{background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;}
+.pb{background:#EFF6FF;color:#1E40AF;border:1px solid #93C5FD;}
+.pgr{background:#F8FAFC;color:#64748B;border:1px solid #CBD5E1;}
+.pteal{background:#ECFEFF;color:#0E7490;border:1px solid #67E8F9;}
 
-/* BANNERS */
-.info{border-left:3px solid var(--teal);background:var(--sky);border-radius:0 8px 8px 0;padding:10px 14px;font-size:.78rem;margin-bottom:18px;line-height:1.55;}
-.info b{color:var(--teal);}
-.warn{border-left:3px solid var(--am);background:var(--aml);border-radius:0 8px 8px 0;padding:10px 14px;font-size:.78rem;color:#78350F;margin-bottom:18px;}
+/* STAT BIG */
+.stat-big{text-align:center;padding:8px 0;}
+.sb-val{font-size:2.4rem;font-weight:800;font-family:'Courier New',monospace;line-height:1;}
+.sb-lbl{font-size:.7rem;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-top:5px;}
+.sb-sub{font-size:.7rem;margin-top:2px;}
 
-/* MATRIX */
-.mx{width:100%;border-collapse:collapse;font-size:.78rem;border-radius:8px;overflow:hidden;}
-.mx th,.mx td{padding:10px 12px;border:1px solid #E2E8F0;text-align:center;}
-.mx th{background:var(--ink);color:#94A3B8;font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;}
-.mx td.rh{background:#F8FAFC;font-weight:600;font-size:.73rem;text-align:left;}
-.mx td.c1{background:var(--p1l);color:var(--p1);font-weight:800;font-size:.9rem;}
-.mx td.c2{background:var(--p2l);color:var(--p2);font-weight:700;}
-.mx td.c3{background:var(--p3l);color:var(--p3);font-weight:700;}
-.mx td.c4{background:var(--p4l);color:var(--p4);font-weight:700;}
+/* SLA REF */
+.sla-ref{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:#E2E8F0;border-radius:9px;overflow:hidden;margin-bottom:16px;}
+.sla-cell{background:#fff;padding:15px;}
+.sla-p{font-size:1.3rem;font-weight:800;margin-bottom:2px;}
+.sla-name{font-size:.7rem;color:#64748B;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
+.sla-line{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #F1F5F9;font-size:.76rem;}
+.sla-line:last-child{border-bottom:none;}
+.sla-line .sk{color:#64748B;}.sla-line .sv{font-weight:700;font-family:'Courier New',monospace;}
+@media(max-width:700px){.sla-ref{grid-template-columns:1fr 1fr;}}
 
-/* CADENCE */
-.cadgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px;margin-bottom:22px;}
-.cadc{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid var(--teal);}
-.cadc.am{border-top-color:var(--am);}.cadc.ok{border-top-color:var(--ok);}
-.cadc.rd{border-top-color:var(--rd);}.cadc.nv{border-top-color:var(--ink);}
-.cadc h3{font-size:.84rem;font-weight:700;margin-bottom:3px;}
-.cadc .freq{font-size:.69rem;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
-.cadc.am .freq{color:var(--am);}.cadc.ok .freq{color:var(--ok);}
-.cadc.rd .freq{color:var(--rd);}
-.cadc ul{font-size:.76rem;color:var(--muted);padding-left:15px;}
-.cadc ul li{margin-bottom:4px;}
+.empty{text-align:center;padding:28px 16px;color:#94A3B8;}
+.empty .ei{font-size:1.8rem;margin-bottom:6px;opacity:.5;}
 
-/* META */
-.mc{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
-.mc h3{font-size:.82rem;font-weight:700;margin-bottom:10px;}
-.mr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #F1F5F9;font-size:.77rem;}
-.mr:last-child{border-bottom:none;}
-.mr .mk{color:var(--muted);}.mr .mv{font-weight:600;color:var(--teal);}
-
-::-webkit-scrollbar{width:5px;height:5px;}
-::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px;}
+/* TWO-UPLOAD STATUS BAR */
+.load-status{background:#fff;border-radius:9px;padding:12px 16px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;}
+.ls-item{display:flex;align-items:center;gap:7px;font-size:.78rem;}
+.ls-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ls-dot.ok{background:#16A34A;}.ls-dot.wait{background:#E2E8F0;border:1px solid #CBD5E1;}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="brand">
-    <div class="logo">SW1</div>
-    <div class="brand-text">
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-logo">SW1</div>
+    <div>
       <h1>Adecco Microsoft Support Pilot</h1>
-      <p>SoftwareONE · Upload weekly ticket export to populate dashboard</p>
+      <p>SoftwareONE · Live Pilot Tracker</p>
     </div>
   </div>
-  <div class="topbar-r">
-    <div class="dp"><label>Pilot Start</label><input type="date" id="pS" value="2026-03-16" onchange="rb()"/></div>
-    <div class="dp"><label>Pilot End</label><input type="date" id="pE" value="2026-04-16" onchange="rb()"/></div>
-    <div class="badge" id="bc">—</div>
+  <div class="hdr-right">
+    <div class="date-box">
+      <label>Pilot Start</label>
+      <input type="date" id="ds" onchange="badge()"/>
+    </div>
+    <div class="date-box">
+      <label>Pilot End</label>
+      <input type="date" id="de" onchange="badge()"/>
+    </div>
+    <div class="day-pill" id="dp">Dates TBD</div>
   </div>
 </div>
 
-<div class="tabbar">
-  <div class="tab on"  onclick="gt('ov')">📊 Overview</div>
-  <div class="tab"     onclick="gt('sl')">🎯 SLA Performance</div>
-  <div class="tab"     onclick="gt('tx')">🎫 All Tickets</div>
-  <div class="tab"     onclick="gt('tg')">📋 SLA Targets</div>
-  <div class="tab"     onclick="gt('gv')">📅 Governance</div>
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab on"  onclick="go('ov')">📊 Overview</div>
+  <div class="tab"     onclick="go('tk')">🎫 Tickets</div>
+  <div class="tab"     onclick="go('sl')">🎯 SLA Tracker</div>
+  <div class="tab"     onclick="go('rf')">📋 SLA Reference</div>
 </div>
 
-<!-- OVERVIEW -->
+<!-- ══ OVERVIEW ══ -->
 <div class="panel on" id="p-ov">
-  <div class="upzone" id="uz" onclick="document.getElementById('fi').click()"
-       ondragover="od(event)" ondragleave="ol()" ondrop="dp(event)">
-    <input type="file" id="fi" accept=".xlsx,.xls,.csv" onchange="lf(this.files[0])"/>
-    <div class="ico">📂</div>
-    <strong>Upload Pilot Ticket Export</strong>
-    <p>Drag & drop or click · .xlsx, .xls or .csv · exported from SWO Services Portal or SNOW</p>
-    <div class="up-btn">Choose File</div>
-  </div>
-  <div id="ov">
-    <div class="empty"><div class="ei">📈</div><h3>No data loaded</h3>
-    <p>Upload a ticket export above — KPIs, charts and SLA bars all populate from your data.<br/>No sample data is baked in. Everything you see will be real pilot numbers.</p></div>
-  </div>
-</div>
 
-<!-- SLA PERFORMANCE -->
-<div class="panel" id="p-sl">
-  <div id="sl"><div class="empty"><div class="ei">🎯</div><h3>Awaiting data</h3><p>Upload a ticket export on the Overview tab.</p></div></div>
-</div>
-
-<!-- ALL TICKETS -->
-<div class="panel" id="p-tx">
-  <div id="tx"><div class="empty"><div class="ei">🎫</div><h3>Awaiting data</h3><p>Upload a ticket export on the Overview tab.</p></div></div>
-</div>
-
-<!-- SLA TARGETS -->
-<div class="panel" id="p-tg">
-  <div class="info">SLA targets from <b>docs.softwareone.cloud — Service Levels: Incidents</b>. Adecco requires SWO to match or exceed the current HCL + Microsoft Unified baseline. Pilot dates are configurable in the header.</div>
-
-  <div class="sh">SWO Incident SLA Targets (from docs.softwareone.cloud)</div>
-  <div class="slacards">
-    <div class="slac s1">
-      <div class="sbadge">P1 — Critical = Sev A</div>
-      <div class="sdesc">Business-critical system down — essential operations impacted (email, finance, customer service)</div>
-      <div class="srow"><span class="sk">Initial Response</span><span class="sv" style="color:var(--p1)">≤ 15 minutes</span></div>
-      <div class="srow"><span class="sk">Resolution Target</span><span class="sv" style="color:var(--p1)">≤ 4 hours</span></div>
-      <div class="srow"><span class="sk">Raise via</span><span class="sv">📞 Phone only</span></div>
-      <div class="srow"><span class="sk">Comms cadence</span><span class="sv">Every 30–60 min</span></div>
-      <div class="srow"><span class="sk">RCA required</span><span class="sv">≤ 5 business days</span></div>
-      <div class="srow"><span class="sk">Coverage</span><span class="sv">EMEA: Zulfi · Off-hrs: Nelson</span></div>
+  <!-- TWO UPLOAD BOXES -->
+  <div class="up-grid">
+    <!-- Ticket Upload -->
+    <div class="upload" id="upT" onclick="document.getElementById('fiT').click()"
+      ondragover="dov(event,'upT')" ondragleave="dol('upT')" ondrop="ddr(event,'T')">
+      <input type="file" id="fiT" accept=".csv" onchange="loadFile(this.files[0],'T')"/>
+      <div class="up-status wait" id="stT"></div>
+      <div class="up-ico">🎫</div>
+      <div class="up-tag t">Ticket Data</div>
+      <h3>Upload Ticket Export</h3>
+      <p>Weekly ticket export from SWO portal</p>
+      <div class="upload-btn">Choose CSV</div>
+      <div class="up-cols">Ticket Number · Priority · State · Category<br>Created date · Closed at · Resolution Time</div>
     </div>
-    <div class="slac s2">
-      <div class="sbadge">P2 — High = Sev B</div>
-      <div class="sdesc">Production system down — not core-critical ops (training tools, project mgmt, CMS unavailable)</div>
-      <div class="srow"><span class="sk">Initial Response</span><span class="sv" style="color:var(--p2)">≤ 1 hour</span></div>
-      <div class="srow"><span class="sk">Resolution Target</span><span class="sv" style="color:var(--p2)">≤ 12 hours</span></div>
-      <div class="srow"><span class="sk">Comms cadence</span><span class="sv">Every 4 hours</span></div>
-      <div class="srow"><span class="sk">RCA required</span><span class="sv">≤ 5 business days</span></div>
-      <div class="srow"><span class="sk">⚠️ vs HCL</span><span class="sv" style="color:var(--am)">HCL was ≤ 8 hrs — discuss</span></div>
-    </div>
-    <div class="slac s3">
-      <div class="sbadge">P3 — Medium = Sev C</div>
-      <div class="sdesc">Production system impaired — available but not functioning optimally; degraded service</div>
-      <div class="srow"><span class="sk">Initial Response</span><span class="sv" style="color:var(--p3)">≤ 4 hours</span></div>
-      <div class="srow"><span class="sk">Resolution Target</span><span class="sv" style="color:var(--p3)">≤ 2 days</span></div>
-      <div class="srow"><span class="sk">Comms cadence</span><span class="sv">Daily update</span></div>
-      <div class="srow"><span class="sk">✅ vs HCL</span><span class="sv" style="color:var(--ok)">HCL was ≤ 3 biz days — faster</span></div>
-    </div>
-    <div class="slac s4">
-      <div class="sbadge">P4 — Low</div>
-      <div class="sdesc">Non-production system impaired — test/training/research, workaround available</div>
-      <div class="srow"><span class="sk">Initial Response</span><span class="sv" style="color:var(--p4)">≤ 12 hours</span></div>
-      <div class="srow"><span class="sk">Resolution Target</span><span class="sv" style="color:var(--p4)">≤ 10 days</span></div>
-      <div class="srow"><span class="sk">Comms cadence</span><span class="sv">Daily update</span></div>
+    <!-- SLA Upload -->
+    <div class="upload" id="upS" onclick="document.getElementById('fiS').click()"
+      ondragover="dov(event,'upS')" ondragleave="dol('upS')" ondrop="ddr(event,'S')">
+      <input type="file" id="fiS" accept=".csv" onchange="loadFile(this.files[0],'S')"/>
+      <div class="up-status wait" id="stS"></div>
+      <div class="up-ico">🎯</div>
+      <div class="up-tag s">SLA Data</div>
+      <h3>Upload SLA Export</h3>
+      <p>SLA events export from SWO portal</p>
+      <div class="upload-btn">Choose CSV</div>
+      <div class="up-cols">Ticket Number · Priority · SLA Type<br>SLA Met · Resolution time (days)</div>
     </div>
   </div>
 
-  <div class="sh">How Priority is Determined — Impact × Urgency Matrix</div>
-  <div class="card" style="margin-bottom:22px;overflow-x:auto;">
-    <h3 style="margin-bottom:14px;">Adecco / caller sets Impact · SWO validates Urgency · Combined = Priority assigned</h3>
-    <table class="mx">
-      <thead><tr><th style="text-align:left;">Urgency ↓ &nbsp;/&nbsp; Impact →</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th></tr></thead>
-      <tbody>
-        <tr><td class="rh">Critical — no workaround, time-sensitive</td><td class="c1">P1</td><td class="c2">P2</td><td class="c2">P2</td><td class="c3">P3</td></tr>
-        <tr><td class="rh">High — workaround avail., time-sensitive</td><td class="c2">P2</td><td class="c2">P2</td><td class="c3">P3</td><td class="c3">P3</td></tr>
-        <tr><td class="rh">Medium — no workaround, not time-sensitive</td><td class="c2">P2</td><td class="c3">P3</td><td class="c3">P3</td><td class="c4">P4</td></tr>
-        <tr><td class="rh">Low — workaround avail., not time-sensitive</td><td class="c3">P3</td><td class="c3">P3</td><td class="c4">P4</td><td class="c4">P4</td></tr>
-      </tbody>
-    </table>
+  <!-- Load status bar -->
+  <div class="load-status" id="loadBar">
+    <div class="ls-item"><div class="ls-dot wait" id="ldT"></div><span id="ltT">Ticket data — not loaded</span></div>
+    <div class="ls-item"><div class="ls-dot wait" id="ldS"></div><span id="ltS">SLA data — not loaded</span></div>
+    <div style="margin-left:auto;font-size:.75rem;color:#94A3B8;">Upload both files to see full dashboard · Export as CSV from SWO portal</div>
   </div>
 
-  <div class="sh">Pilot Success Criteria (from Adecco RFP Questionnaire)</div>
-  <div class="tblwrap">
-    <table>
-      <thead><tr><th>Area</th><th>Metric</th><th>SWO Target</th><th>HCL Current Baseline</th><th>Status</th></tr></thead>
-      <tbody>
-        <tr><td><b>P1 Response</b></td><td>Acknowledgement time</td><td style="color:var(--p1);font-weight:700;">≤ 15 min</td><td>≤ 15 min (match)</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>P1 Resolution</b></td><td>Restore to service</td><td style="color:var(--p1);font-weight:700;">≤ 4 hrs</td><td>≤ 4 hrs (match)</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>P2 Response</b></td><td>Acknowledgement time</td><td style="color:var(--p2);font-weight:700;">≤ 1 hr</td><td>≤ 1 hr (match)</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>P2 Resolution</b></td><td>Restore to service</td><td style="color:var(--p2);font-weight:700;">≤ 12 hrs</td><td style="color:var(--am);font-weight:600;">≤ 8 hrs ⚠️ SWO slower</td><td><span class="pill pam">Discuss at kickoff</span></td></tr>
-        <tr><td><b>P3 Response</b></td><td>Acknowledgement time</td><td style="color:var(--p3);font-weight:700;">≤ 4 hrs</td><td>≤ 4 hrs (match)</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>P3 Resolution</b></td><td>Restore to service</td><td style="color:var(--p3);font-weight:700;">≤ 2 days</td><td style="color:var(--ok);font-weight:600;">≤ 3 biz days ✅ SWO faster</td><td><span class="pill pok">SWO advantage</span></td></tr>
-        <tr><td><b>P4 Response</b></td><td>Acknowledgement time</td><td style="color:var(--p4);font-weight:700;">≤ 12 hrs</td><td>—</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>P4 Resolution</b></td><td>Resolution time</td><td style="color:var(--p4);font-weight:700;">≤ 10 days</td><td>—</td><td><span class="pill pbl">Track in pilot</span></td></tr>
-        <tr><td><b>MTTR</b></td><td>vs HCL baseline</td><td style="font-weight:700;">≥ 10% better</td><td>TBC at kickoff</td><td><span class="pill pgr">TBC at kickoff</span></td></tr>
-        <tr><td><b>FCR (L2)</b></td><td>First contact resolution rate</td><td style="font-weight:700;">≥ 30%</td><td>TBC at kickoff</td><td><span class="pill pgr">TBC at kickoff</span></td></tr>
-        <tr><td><b>CSAT</b></td><td>Per-ticket satisfaction</td><td style="font-weight:700;">≥ 4.5 / 5</td><td>≥ 4.5/5 (HCL)</td><td><span class="pill pbl">Per ticket</span></td></tr>
-        <tr><td><b>KB Docs</b></td><td>Tickets with KB note</td><td style="font-weight:700;">100%</td><td>—</td><td><span class="pill pbl">Mandatory on closure</span></td></tr>
-        <tr><td><b>No unmanaged P1</b></td><td>Unmanaged Sev A incidents</td><td style="font-weight:700;">Zero</td><td>Zero</td><td><span class="pill pbl">Monitor daily</span></td></tr>
-        <tr><td><b>Process Fit</b></td><td>Deviations from Adecco GSD</td><td style="font-weight:700;">Zero material</td><td>—</td><td><span class="pill pbl">Log deviations</span></td></tr>
-        <tr><td><b>Reporting</b></td><td>Weekly on-time reports</td><td style="font-weight:700;">100%</td><td>—</td><td><span class="pill pbl">Every Friday</span></td></tr>
-      </tbody>
-    </table>
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-val" id="k0">—</div><div class="kpi-lbl">Total Tickets</div><div class="kpi-sub">This pilot period</div></div>
+    <div class="kpi r"><div class="kpi-val" id="k1">—</div><div class="kpi-lbl">P1 / Sev A</div><div class="kpi-sub">Ack target ≤ 15 min</div></div>
+    <div class="kpi a"><div class="kpi-val" id="k2">—</div><div class="kpi-lbl">P2 / Sev B</div><div class="kpi-sub">Ack target ≤ 1 hr</div></div>
+    <div class="kpi"><div class="kpi-val" id="k3">—</div><div class="kpi-lbl">Open Tickets</div><div class="kpi-sub">Not yet closed</div></div>
+    <div class="kpi g"><div class="kpi-val" id="k4">—</div><div class="kpi-lbl">Overall SLA Met</div><div class="kpi-sub">Target ≥ 95%</div></div>
+    <div class="kpi b"><div class="kpi-val" id="k5">—</div><div class="kpi-lbl">Response SLA Met</div><div class="kpi-sub">From SLA file</div></div>
+    <div class="kpi b"><div class="kpi-val" id="k6">—</div><div class="kpi-lbl">Resolution SLA Met</div><div class="kpi-sub">From SLA file</div></div>
   </div>
-  <div class="warn">⚠️ <b>Resolution time:</b> SWO resolution targets measure <b>active work time</b> — the clock pauses when a ticket is on hold awaiting caller or vendor response. Agree stop-clock methodology with Adecco at kickoff so MTTR comparison vs HCL is like-for-like.</div>
-</div>
 
-<!-- GOVERNANCE -->
-<div class="panel" id="p-gv">
-  <div class="info">BAU operating rhythm for the pilot. <b>Every ticket monitored by SDM throughout.</b> Pilot success = contract win. Dates are configurable in the header.</div>
-  <div class="kgrid">
-    <div class="kpi"   ><div class="v">Daily</div><div class="l">SDM Ticket Review</div><div class="s">Every morning, no exceptions</div></div>
-    <div class="kpi am"><div class="v">2×/wk</div><div class="l">Internal Standup</div><div class="s">All SWO pilot team</div></div>
-    <div class="kpi ok"><div class="v">Weekly</div><div class="l">Adecco Report</div><div class="s">Every Friday — SDM Zulfi</div></div>
-    <div class="kpi rd"><div class="v">≤15m</div><div class="l">P1 Response SLA</div><div class="s">Phone only. SDM on duty always.</div></div>
-  </div>
-  <div class="sh">Operating Cadence</div>
-  <div class="cadgrid">
-    <div class="cadc">
-      <h3>☀️ Daily Morning — SDM</h3><div class="freq">Every working day</div>
-      <ul><li>Review all open tickets + SLA timers</li><li>P1 overnight? Act immediately</li><li>Flag breach-risk tickets + assign owner</li><li>Verify SNOW S1PILOT tag mapping</li><li>Check tickets aged &gt;10 days</li><li>Update internal tracker</li></ul>
+  <div class="g2">
+    <div class="card">
+      <h3>Priority Breakdown</h3>
+      <div id="priChart"><div class="empty"><div class="ei">🔢</div><p>Upload ticket data</p></div></div>
     </div>
-    <div class="cadc">
-      <h3>🔄 Throughout Day</h3><div class="freq">Continuous</div>
-      <ul><li>P1 comms every 30–60 min</li><li>P2 comms every 4 hours</li><li>P3/P4 daily update to Adecco GSD</li><li>All steps documented in ticket</li><li>MS escalations co-owned by SDM</li><li>KB note mandatory before closure</li></ul>
-    </div>
-    <div class="cadc am">
-      <h3>🤝 2×/Week Internal Standup</h3><div class="freq">Mon & Thu suggested</div>
-      <ul><li>Zulfi, Nelson, Cloud Support, Marcin</li><li>Open tickets + SLA status</li><li>Blockers, escalations, CSAT running avg</li><li>Process deviation log</li><li>Next-week priorities</li></ul>
-    </div>
-    <div class="cadc ok">
-      <h3>📊 Weekly Report — Adecco</h3><div class="freq">Every Friday</div>
-      <ul><li>Ticket volume by severity &amp; category</li><li>SLA attainment % (response + resolution)</li><li>CSAT scores + running average</li><li>Open P1/P2 tickets</li><li>KB articles added</li><li>MTTR vs HCL baseline</li></ul>
-    </div>
-    <div class="cadc rd">
-      <h3>🚨 P1/Sev A Bridge Call</h3><div class="freq">Any P1 — phone only</div>
-      <ul><li>EMEA hours: Zulfi Usman</li><li>Off-EMEA: Nelson Porras</li><li>Adecco MIM invited immediately</li><li>Updates every 30–60 min</li><li>RCA within 5 business days</li></ul>
-    </div>
-    <div class="cadc nv">
-      <h3>🏁 End-of-Pilot Review</h3><div class="freq" id="eol" style="color:var(--muted)">~16 April 2026</div>
-      <ul><li>Full metrics vs all 15 success criteria</li><li>CSAT summary across all tickets</li><li>MTTR vs HCL baseline comparison</li><li>Lessons learned + improvement plan</li><li>Contract decision pack — Zulfi + Marcin</li></ul>
+    <div class="card">
+      <h3>Ticket State</h3>
+      <div id="stateChart"><div class="empty"><div class="ei">🔄</div><p>Upload ticket data</p></div></div>
     </div>
   </div>
   <div class="g2">
-    <div class="mc"><h3>✅ Daily SDM Checklist</h3>
-      <div class="mr"><span class="mk">P1 ack'd within 15 min?</span><span class="mv">Check every morning</span></div>
-      <div class="mr"><span class="mk">SLA breach risk today?</span><span class="mv">Flag + action owner</span></div>
-      <div class="mr"><span class="mk">Tickets aged &gt;10 days?</span><span class="mv">Review with engineer</span></div>
-      <div class="mr"><span class="mk">CSAT responses in?</span><span class="mv">Update running average</span></div>
-      <div class="mr"><span class="mk">All tickets have owner?</span><span class="mv">Zero orphan tickets</span></div>
-      <div class="mr"><span class="mk">S1PILOT tags correct?</span><span class="mv">Spot-check daily</span></div>
+    <div class="card">
+      <h3>Top Categories</h3>
+      <div id="catChart"><div class="empty"><div class="ei">📂</div><p>Upload ticket data</p></div></div>
     </div>
-    <div class="mc"><h3>📋 Weekly Adecco Report</h3>
-      <div class="mr"><span class="mk">Ticket volume (sev + category)</span><span class="mv">SNOW S1PILOT tag</span></div>
-      <div class="mr"><span class="mk">Response SLA %</span><span class="mv">Target ≥95%</span></div>
-      <div class="mr"><span class="mk">Resolution SLA %</span><span class="mv">Target ≥95%</span></div>
-      <div class="mr"><span class="mk">CSAT average</span><span class="mv">Target ≥4.5/5</span></div>
-      <div class="mr"><span class="mk">MTTR vs HCL</span><span class="mv">Target ≥10% improvement</span></div>
-      <div class="mr"><span class="mk">KB articles this week</span><span class="mv">Target 100% coverage</span></div>
+    <div class="card">
+      <h3>Weekly Volume</h3>
+      <div id="wkChart"><div class="empty"><div class="ei">📈</div><p>Upload ticket data</p></div></div>
     </div>
   </div>
 </div>
 
+<!-- ══ TICKETS ══ -->
+<div class="panel" id="p-tk">
+  <div class="info"><b>Ticket data</b> shows all fields from your ticket export. SLA Met column is enriched from your SLA export where both files are loaded.</div>
+  <div id="tkStats" class="kpi-row" style="display:none;"></div>
+  <div class="sec">All Pilot Tickets</div>
+  <div class="tbl-wrap" id="tkWrap">
+    <div class="empty"><div class="ei">🎫</div><p>Upload ticket data on the Overview tab</p></div>
+  </div>
+</div>
+
+<!-- ══ SLA TRACKER ══ -->
+<div class="panel" id="p-sl">
+  <div class="info"><b>SLA data</b> comes from your dedicated SLA export — one row per SLA event (Response + Resolution tracked separately per ticket).</div>
+
+  <!-- Top 3 stats -->
+  <div class="g3">
+    <div class="card stat-big">
+      <div class="sb-val" id="sl0" style="color:#028090;">—</div>
+      <div class="sb-lbl">Response SLA Met</div>
+      <div class="sb-sub" style="color:#94A3B8;">Target ≥ 95%</div>
+    </div>
+    <div class="card stat-big">
+      <div class="sb-val" id="sl1" style="color:#028090;">—</div>
+      <div class="sb-lbl">Resolution SLA Met</div>
+      <div class="sb-sub" style="color:#94A3B8;">Target ≥ 95%</div>
+    </div>
+    <div class="card stat-big">
+      <div class="sb-val" id="sl2" style="color:#028090;">—</div>
+      <div class="sb-lbl">Overall SLA Met</div>
+      <div class="sb-sub" style="color:#94A3B8;">Both response + resolution</div>
+    </div>
+  </div>
+
+  <div class="sec">Response SLA by Priority</div>
+  <div class="card" style="margin-bottom:16px;">
+    <div id="slaRespBars"><div class="empty"><div class="ei">🎯</div><p>Upload SLA data to see response performance</p></div></div>
+  </div>
+
+  <div class="sec">Resolution SLA by Priority</div>
+  <div class="card" style="margin-bottom:16px;">
+    <div id="slaResBars"><div class="empty"><div class="ei">🎯</div><p>Upload SLA data to see resolution performance</p></div></div>
+  </div>
+
+  <div class="sec">SLA Breach Detail</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Ticket</th><th>Priority</th><th>SLA Type</th><th>Category</th><th>Res. Time (days)</th><th>Status</th></tr></thead>
+      <tbody id="breachBody">
+        <tr><td colspan="6"><div class="empty"><div class="ei">✅</div><p>Upload SLA data to see breach detail</p></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SLA REFERENCE ══ -->
+<div class="panel" id="p-rf">
+  <div class="info">Official <b>SoftwareONE SLA framework</b> — source: docs.softwareone.cloud/knowledge-base/service-levels-incidents</div>
+
+  <div class="sec">Incident Service Levels</div>
+  <div class="sla-ref">
+    <div class="sla-cell">
+      <div class="sla-p" style="color:#DC2626;">P1</div>
+      <div class="sla-name">Critical / Sev A</div>
+      <div class="sla-line"><span class="sk">Response</span><span class="sv" style="color:#DC2626;">15 min</span></div>
+      <div class="sla-line"><span class="sk">Resolution</span><span class="sv" style="color:#DC2626;">4 hrs</span></div>
+      <div class="sla-line"><span class="sk">Comms</span><span class="sv">Every 30 min</span></div>
+      <div class="sla-line"><span class="sk">Raise via</span><span class="sv">Phone only</span></div>
+      <div class="sla-line"><span class="sk">RCA</span><span class="sv">5 biz days</span></div>
+    </div>
+    <div class="sla-cell">
+      <div class="sla-p" style="color:#EA580C;">P2</div>
+      <div class="sla-name">High / Sev B</div>
+      <div class="sla-line"><span class="sk">Response</span><span class="sv" style="color:#EA580C;">1 hr</span></div>
+      <div class="sla-line"><span class="sk">Resolution</span><span class="sv" style="color:#EA580C;">12 hrs</span></div>
+      <div class="sla-line"><span class="sk">Comms</span><span class="sv">Every 4 hrs</span></div>
+      <div class="sla-line"><span class="sk">Raise via</span><span class="sv">Portal/Phone</span></div>
+      <div class="sla-line"><span class="sk">RCA</span><span class="sv">5 biz days</span></div>
+    </div>
+    <div class="sla-cell">
+      <div class="sla-p" style="color:#CA8A04;">P3</div>
+      <div class="sla-name">Medium / Sev C</div>
+      <div class="sla-line"><span class="sk">Response</span><span class="sv" style="color:#CA8A04;">4 hrs</span></div>
+      <div class="sla-line"><span class="sk">Resolution</span><span class="sv" style="color:#CA8A04;">2 days</span></div>
+      <div class="sla-line"><span class="sk">Comms</span><span class="sv">Daily</span></div>
+      <div class="sla-line"><span class="sk">Raise via</span><span class="sv">Portal/Email</span></div>
+      <div class="sla-line"><span class="sk">RCA</span><span class="sv">On request</span></div>
+    </div>
+    <div class="sla-cell">
+      <div class="sla-p" style="color:#16A34A;">P4</div>
+      <div class="sla-name">Low</div>
+      <div class="sla-line"><span class="sk">Response</span><span class="sv" style="color:#16A34A;">12 hrs</span></div>
+      <div class="sla-line"><span class="sk">Resolution</span><span class="sv" style="color:#16A34A;">10 days</span></div>
+      <div class="sla-line"><span class="sk">Comms</span><span class="sv">Daily</span></div>
+      <div class="sla-line"><span class="sk">Raise via</span><span class="sv">Portal/Email</span></div>
+      <div class="sla-line"><span class="sk">RCA</span><span class="sv">N/A</span></div>
+    </div>
+  </div>
+
+  <div class="sec">Adecco Pilot — SLA Alignment</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Adecco Requirement</th><th>SWO SLA</th><th>Aligned?</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>P1 Ack ≤ 15 min</td><td style="color:#16A34A;font-weight:700;">15 min ✓</td><td><span class="pill pg">Aligned</span></td><td style="color:#64748B;font-size:.75rem;">Phone only. SDM on duty.</td></tr>
+        <tr><td>P1 Restore ≤ 4 hrs</td><td style="color:#16A34A;font-weight:700;">4 hrs ✓</td><td><span class="pill pg">Aligned</span></td><td style="color:#64748B;font-size:.75rem;">MIM bridge. RCA in 5 days.</td></tr>
+        <tr><td>P2 Ack ≤ 1 hr</td><td style="color:#16A34A;font-weight:700;">1 hr ✓</td><td><span class="pill pg">Aligned</span></td><td style="color:#64748B;font-size:.75rem;">Zulfi (EMEA) / Nelson (off-EMEA).</td></tr>
+        <tr><td>P2 Restore ≤ 8 hrs</td><td style="color:#F59E0B;font-weight:700;">12 hrs (SWO std)</td><td><span class="pill pa">Discuss</span></td><td style="color:#64748B;font-size:.75rem;"><b>Gap:</b> agree enhanced target at kickoff.</td></tr>
+        <tr><td>P3 Ack ≤ 4 hrs</td><td style="color:#16A34A;font-weight:700;">4 hrs ✓</td><td><span class="pill pg">Aligned</span></td><td style="color:#64748B;font-size:.75rem;">Standard queue.</td></tr>
+        <tr><td>CSAT ≥ 4.5/5</td><td>Per-ticket survey</td><td><span class="pill pb">Tracked</span></td><td style="color:#64748B;font-size:.75rem;">CSAT prompt on every closure.</td></tr>
+        <tr><td>MTTR improve ≥ 10%</td><td>HCL baseline TBC</td><td><span class="pill pb">TBC kickoff</span></td><td style="color:#64748B;font-size:.75rem;">Need HCL data to calculate.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec">Priority Matrix</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Urgency ↓ / Impact →</th><th style="color:#FCA5A5;">Critical</th><th style="color:#FDBA74;">High</th><th style="color:#FDE047;">Medium</th><th style="color:#86EFAC;">Low</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;color:#64748B;">Critical</td><td><span class="pill pp1">P1</span></td><td><span class="pill pp2">P2</span></td><td><span class="pill pp2">P2</span></td><td><span class="pill pp3">P3</span></td></tr>
+        <tr><td style="font-weight:600;color:#64748B;">High</td><td><span class="pill pp2">P2</span></td><td><span class="pill pp2">P2</span></td><td><span class="pill pp3">P3</span></td><td><span class="pill pp3">P3</span></td></tr>
+        <tr><td style="font-weight:600;color:#64748B;">Medium</td><td><span class="pill pp2">P2</span></td><td><span class="pill pp3">P3</span></td><td><span class="pill pp3">P3</span></td><td><span class="pill pp4">P4</span></td></tr>
+        <tr><td style="font-weight:600;color:#64748B;">Low</td><td><span class="pill pp3">P3</span></td><td><span class="pill pp3">P3</span></td><td><span class="pill pp4">P4</span></td><td><span class="pill pp4">P4</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:.72rem;color:#94A3B8;margin-top:6px;">Customer specifies Impact · SoftwareONE specifies Urgency · Matrix determines Priority</p>
+</div>
+
 <script>
-/* Chart registry */
-const CH={};
-function mk(id,cfg){if(CH[id])CH[id].destroy();CH[id]=new Chart(document.getElementById(id),cfg);}
+// ── State ────────────────────────────────────────────────────────────────
+var TDATA=null, SDATA=null;
 
-/* SLA targets — docs.softwareone.cloud */
-const SLA={
-  P1:{resp:15/1440,res:4/24,   rl:'≤4 hrs',  col:'#DC2626'},
-  P2:{resp:60/1440,res:12/24,  rl:'≤12 hrs', col:'#EA580C'},
-  P3:{resp:240/1440,res:2,     rl:'≤2 days', col:'#CA8A04'},
-  P4:{resp:720/1440,res:10,    rl:'≤10 days',col:'#16A34A'},
-};
-
-/* Badge */
-function rb(){
-  const s=new Date(document.getElementById('pS').value);
-  const e=new Date(document.getElementById('pE').value);
-  const n=new Date();
-  const el=document.getElementById('eol');
-  if(el) el.textContent='~'+e.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-  const b=document.getElementById('bc');
-  if(isNaN(s)||isNaN(e)){b.textContent='Set dates';return;}
+// ── Pilot badge ───────────────────────────────────────────────────────────
+function badge(){
+  var sv=document.getElementById('ds').value,ev=document.getElementById('de').value,b=document.getElementById('dp');
+  if(!sv||!ev){b.textContent='Dates TBD';b.style.background='#028090';return;}
+  var s=new Date(sv),e=new Date(ev),n=new Date();
   if(n<s){b.textContent='Starts '+s.toLocaleDateString('en-GB',{day:'numeric',month:'short'});return;}
-  if(n>e){b.style.background='#7C3AED';b.textContent='Pilot Complete';return;}
-  const tot=Math.ceil((e-s)/864e5),day=Math.floor((n-s)/864e5)+1,left=Math.ceil((e-n)/864e5);
-  b.textContent=`Day ${day}/${tot} · ${left}d left`;
+  if(n>e){b.textContent='Pilot Complete';b.style.background='#2563EB';return;}
+  var total=Math.ceil((e-s)/864e5),day=Math.floor((n-s)/864e5)+1,left=Math.ceil((e-n)/864e5);
+  b.textContent='Day '+day+'/'+total+' · '+left+'d left';
 }
-rb();
+badge();
 
-/* Tabs */
-const TN=['ov','sl','tx','tg','gv'];
-function gt(n){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',TN[i]===n));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+n));
-}
-
-/* Drag/drop */
-function od(e){e.preventDefault();document.getElementById('uz').classList.add('drag');}
-function ol(){document.getElementById('uz').classList.remove('drag');}
-function dp(e){e.preventDefault();ol();lf(e.dataTransfer.files[0]);}
-
-/* Priority normaliser */
-function np(v){
-  const s=String(v||'').toUpperCase();
-  if(/P1|CRITICAL|SEV.?A/.test(s))return'P1';
-  if(/P2|HIGH|SEV.?B/.test(s))return'P2';
-  if(/P3|MEDIUM|MED|SEV.?C/.test(s))return'P3';
-  if(/P4|LOW|P5|ADVISORY/.test(s))return'P4';
-  return'P3';
+// ── Tabs ──────────────────────────────────────────────────────────────────
+var TABS=['ov','tk','sl','rf'];
+function go(n){
+  TABS.forEach(function(t,i){
+    document.querySelectorAll('.tab')[i].classList.toggle('on',t===n);
+    document.getElementById('p-'+t).classList.toggle('on',t===n);
+  });
 }
 
-/* Pills */
-function pp(p){const m={P1:'pp1',P2:'pp2',P3:'pp3',P4:'pp4'},l={P1:'P1 Critical',P2:'P2 High',P3:'P3 Medium',P4:'P4 Low'};return`<span class="pill ${m[p]||'pgr'}">${l[p]||p}</span>`;}
-function sp(v){const s=String(v||'').toLowerCase();if(/clos|resolv|done/.test(s))return`<span class="pill pok">${v}</span>`;if(/hold|wait|pend/.test(s))return`<span class="pill pam">${v}</span>`;if(/open|progress|active|new/.test(s))return`<span class="pill pbl">${v}</span>`;return`<span class="pill pgr">${v}</span>`;}
-function slp(v){const s=String(v||'').toLowerCase();if(s==='yes'||s==='true'||s==='1')return`<span class="pill pok">✓ Met</span>`;if(s==='no'||s==='false'||s==='0')return`<span class="pill prd">✗ Breached</span>`;return`<span class="pill pgr">${v}</span>`;}
-
-/* Column finder */
-function fc(k,t){return k.find(x=>t.some(t2=>x.toLowerCase().includes(t2.toLowerCase())))||null;}
-
-/* File load */
-function lf(file){
-  if(!file)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    try{
-      let rows;
-      if(file.name.toLowerCase().endsWith('.csv')){
-        const ln=e.target.result.split('\n').filter(l=>l.trim());
-        const hd=ln[0].split(',').map(h=>h.replace(/^"|"$/g,'').trim());
-        rows=ln.slice(1).map(l=>{const v=l.split(',').map(x=>x.replace(/^"|"$/g,'').trim());const o={};hd.forEach((h,i)=>o[h]=v[i]||'');return o;}).filter(r=>Object.values(r).some(v=>v));
-      }else{
-        const wb=XLSX.read(e.target.result,{type:'binary',cellDates:true});
-        rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
-      }
-      if(!rows.length){alert('No rows found.');return;}
-      render(rows,file.name);
-    }catch(err){alert('Could not read file: '+err.message);}
-  };
-  file.name.toLowerCase().endsWith('.csv')?r.readAsText(file):r.readAsBinaryString(file);
+// ── Drag/drop ─────────────────────────────────────────────────────────────
+function dov(e,id){e.preventDefault();document.getElementById(id).classList.add('drag');}
+function dol(id){document.getElementById(id).classList.remove('drag');}
+function ddr(e,type){
+  e.preventDefault();
+  var id=type==='T'?'upT':'upS';
+  dol(id);
+  loadFile(e.dataTransfer.files[0],type);
 }
 
-/* Main render */
-function render(rows,fname){
-  const keys=Object.keys(rows[0]);
-  const C={
-    pri:   fc(keys,['priority','prior','sev','severity']),
-    state: fc(keys,['state','status','stage']),
-    cat:   fc(keys,['category','cat','service name','service']),
-    tick:  fc(keys,['ticket number','ticket','inc','number','id']),
-    crd:   fc(keys,['created date','created','opened','raised','date']),
-    cls:   fc(keys,['closed at','closed','resolved','close date']),
-    rdys:  fc(keys,['resolution (in days)','res days','days']),
-    rtm:   fc(keys,['resolution time','res time']),
-    csat:  fc(keys,['csat','satisfaction','rating','score']),
-    smet:  fc(keys,['sla met','sla_met','met']),
-    styp:  fc(keys,['sla type','sla_type']),
-    type:  fc(keys,['type','ticket type']),
-    kb:    fc(keys,['kb','knowledge']),
-  };
-
-  rows=rows.map(r=>({...r,_P:np(C.pri?r[C.pri]:'P3')}));
-
-  const tot=rows.length;
-  const bp={P1:0,P2:0,P3:0,P4:0};
-  rows.forEach(r=>bp[r._P]=(bp[r._P]||0)+1);
-
-  const isCl=r=>/clos|resolv|done/i.test(String(C.state?r[C.state]:''));
-  const isHo=r=>/hold|wait|pend/i.test(String(C.state?r[C.state]:''));
-  const cl=rows.filter(isCl).length,ho=rows.filter(isHo).length,op=rows.filter(r=>!isCl(r)&&!isHo(r)).length;
-
-  /* Monthly */
-  const mon={};
-  if(C.crd)rows.forEach(r=>{const raw=r[C.crd];const dt=raw instanceof Date?raw:new Date(raw);if(isNaN(dt))return;const m=dt.toISOString().slice(0,7);mon[m]=(mon[m]||0)+1;});
-  const mL=Object.keys(mon).sort(),mD=mL.map(m=>mon[m]);
-
-  /* Categories */
-  const cm={};
-  if(C.cat)rows.forEach(r=>{const v=r[C.cat]||'Unknown';cm[v]=(cm[v]||0)+1;});
-  const tc=Object.entries(cm).sort((a,b)=>b[1]-a[1]).slice(0,10);
-
-  /* SLA */
-  let sm=0,st=0;
-  const sbp={P1:{m:0,t:0},P2:{m:0,t:0},P3:{m:0,t:0},P4:{m:0,t:0}};
-  const sbt={};
-  if(C.smet){
-    rows.forEach(r=>{
-      const v=String(r[C.smet]).toLowerCase();
-      const ok=v==='yes'||v==='true'||v==='1',bad=v==='no'||v==='false'||v==='0';
-      if(ok||bad){if(ok){sm++;sbp[r._P].m++;}st++;sbp[r._P].t++;
-        if(C.styp){const t=r[C.styp]||'Unknown';if(!sbt[t])sbt[t]={m:0,t:0};if(ok)sbt[t].m++;sbt[t].t++;}
-      }
-    });
+// ── Parse CSV ─────────────────────────────────────────────────────────────
+function parseCSV(text){
+  var lines=text.split('\n').filter(function(l){return l.trim();});
+  if(!lines.length)return[];
+  // Handle quoted CSV properly
+  function splitLine(line){
+    var cols=[],cur='',inQ=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur.trim());cur='';}
+      else{cur+=c;}
+    }
+    cols.push(cur.trim());
+    return cols;
   }
+  var headers=splitLine(lines[0]);
+  return lines.slice(1).map(function(line){
+    var vals=splitLine(line);
+    var obj={};
+    headers.forEach(function(h,i){obj[h]=vals[i]||'';});
+    return obj;
+  }).filter(function(r){return Object.values(r).some(function(v){return v;});});
+}
 
-  /* Res time */
-  const rbp={P1:[],P2:[],P3:[],P4:[]};
-  const rk=C.rdys||C.rtm;
-  if(rk)rows.forEach(r=>{const v=parseFloat(String(r[rk]).replace(/[^\d.]/g,''));if(!isNaN(v)&&v>0)rbp[r._P].push(v);});
-  const ar={};
-  Object.keys(rbp).forEach(p=>{const a=rbp[p];if(a.length)ar[p]=a.reduce((s,x)=>s+x,0)/a.length;});
+// ── Load file ─────────────────────────────────────────────────────────────
+function loadFile(file,type){
+  if(!file)return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var data=parseCSV(e.target.result);
+    if(!data||!data.length){alert('No data found. Make sure you export as CSV from the SWO portal.');return;}
+    if(type==='T'){
+      TDATA=data;
+      markLoaded('T',file.name,data.length,'upT');
+    } else {
+      SDATA=data;
+      markLoaded('S',file.name,data.length,'upS');
+    }
+    renderAll();
+  };
+  r.readAsText(file);
+}
 
-  /* CSAT */
-  let cs=0,cn=0;
-  if(C.csat)rows.forEach(r=>{const v=parseFloat(r[C.csat]);if(!isNaN(v)&&v>0){cs+=v;cn++;}});
-  const ca=cn?(cs/cn).toFixed(1):null;
+function markLoaded(type,fname,count,boxId){
+  var box=document.getElementById(boxId);
+  var tag=type==='T'?'<span class="up-tag t">Ticket Data</span>':'<span class="up-tag s">SLA Data</span>';
+  box.innerHTML='<div class="up-status ok"></div>'+tag+'<div class="up-done" style="margin-top:6px;">✅ '+fname+'<br><span>'+count+' rows loaded</span></div>';
+  box.onclick=null;
+  document.getElementById('ld'+type).className='ls-dot ok';
+  document.getElementById('lt'+type).textContent=(type==='T'?'Ticket':'SLA')+' data — '+count+' rows loaded from '+fname;
+}
 
-  /* KB */
-  let kb=0;
-  if(C.kb)rows.forEach(r=>{const v=String(r[C.kb]||'').toLowerCase();if(v&&v!=='no'&&v!=='false'&&v!=='0')kb++;});
+// ── Priority helpers ──────────────────────────────────────────────────────
+function mapP(v){
+  var s=String(v||'').toUpperCase();
+  if(s.indexOf('P1')>=0||s.indexOf('CRITICAL')>=0)return 'P1';
+  if(s.indexOf('P2')>=0||s.indexOf('HIGH')>=0)return 'P2';
+  if(s.indexOf('P3')>=0||s.indexOf('MEDIUM')>=0||s.indexOf('MED')>=0)return 'P3';
+  if(s.indexOf('P4')>=0||s.indexOf('LOW')>=0)return 'P4';
+  return 'OTHER';
+}
+function priPill(v){
+  var p=mapP(v),m={P1:['pp1','P1 Sev A'],P2:['pp2','P2 Sev B'],P3:['pp3','P3 Sev C'],P4:['pp4','P4 Low'],OTHER:['pgr',v||'—']};
+  return '<span class="pill '+(m[p]||m.OTHER)[0]+'">'+(m[p]||m.OTHER)[1]+'</span>';
+}
+function stPill(v){
+  var s=String(v||'').toLowerCase();
+  if(/clos|resolv|done/.test(s))return '<span class="pill pg">'+v+'</span>';
+  if(/hold|wait/.test(s))return '<span class="pill pa">'+v+'</span>';
+  if(/breach|escal/.test(s))return '<span class="pill pr">'+v+'</span>';
+  return '<span class="pill pb">'+v+'</span>';
+}
+function slaPill(v){
+  var s=String(v||'').toLowerCase();
+  if(s==='yes'||s==='true'||s==='met')return '<span class="pill pg">Met</span>';
+  if(s==='no'||s==='false'||/^no/.test(s))return '<span class="pill pr">Breached</span>';
+  return '<span class="pill pgr">'+(v||'—')+'</span>';
+}
+function slaColor(p){return p>=95?'#16A34A':p>=80?'#F59E0B':'#DC2626';}
+function isMet(v){var s=String(v||'').toLowerCase();return s==='yes'||s==='true'||s==='met';}
+function isBreached(v){var s=String(v||'').toLowerCase();return s==='no'||s==='false'||/^no/.test(s);}
 
-  const sp2=st?Math.round(sm/st*100):null;
-  const skls=sp2===null?'':sp2>=95?'ok':sp2>=85?'am':'rd';
+// ── Column finder ─────────────────────────────────────────────────────────
+function fc(keys){
+  function f(){
+    var terms=[].slice.call(arguments);
+    return keys.find(function(k){return terms.some(function(t){return k.toLowerCase().indexOf(t.toLowerCase())>=0;});});
+  }
+  return {
+    num:f('ticket number','ticket #','number','inc','ticket'),
+    pri:f('priority','sev','severity'),
+    state:f('state','status'),
+    cat:f('category','service name','service'),
+    slamet:f('sla met','sla','met'),
+    slatype:f('sla type','slatype','type'),
+    resdays:f('resolution time (days)','resolution (in days)','resolutiontime','res time','resolution_time'),
+    created:f('created date','creation date','created','open date','date'),
+    closed:f('closed at','closed date','close'),
+    csat:f('csat','satisfaction','rating','score')
+  };
+}
 
-  /* ── OVERVIEW ────────────────────────────────────────── */
-  document.getElementById('uz').style.display='none';
-  document.getElementById('ov').innerHTML=`
-    <div class="fpill"><b>📁 ${fname}</b> · ${tot} tickets loaded<button onclick="reset()">↺ Upload new file</button></div>
-    <div class="kgrid">
-      <div class="kpi"  ><div class="v">${tot}</div><div class="l">Total Tickets</div><div class="s">All severities</div></div>
-      <div class="kpi rd"><div class="v">${bp.P1}</div><div class="l">P1 / Sev A</div><div class="s">Target: 0 unmanaged · ≤15min resp</div></div>
-      <div class="kpi am"><div class="v">${bp.P2}</div><div class="l">P2 / Sev B</div><div class="s">≤1hr resp · ≤12hr res</div></div>
-      <div class="kpi nt"><div class="v">${bp.P3}</div><div class="l">P3 / Sev C</div><div class="s">≤4hr resp · ≤2 day res</div></div>
-      <div class="kpi ok"><div class="v">${bp.P4}</div><div class="l">P4 / Low</div><div class="s">≤12hr resp · ≤10 day res</div></div>
-      <div class="kpi ok"><div class="v">${cl}</div><div class="l">Closed</div><div class="s">${tot?Math.round(cl/tot*100):0}% closure rate</div></div>
-      <div class="kpi am"><div class="v">${ho}</div><div class="l">On Hold</div><div class="s">Awaiting action</div></div>
-      ${sp2!==null?`<div class="kpi ${skls}"><div class="v">${sp2}%</div><div class="l">SLA Met</div><div class="s">${sm}/${st} · target ≥95%</div></div>`:''}
-      ${ca?`<div class="kpi ${parseFloat(ca)>=4.5?'ok':'rd'}"><div class="v">${ca}</div><div class="l">Avg CSAT</div><div class="s">Target ≥4.5/5 · n=${cn}</div></div>`:''}
-      ${kb&&cl?`<div class="kpi ${kb===cl?'ok':'am'}"><div class="v">${Math.round(kb/cl*100)}%</div><div class="l">KB Documented</div><div class="s">${kb}/${cl} closed</div></div>`:''}
-    </div>
-    <div class="g2">
-      <div class="card"><h3>📅 Ticket Volume by Month</h3><canvas id="cM"></canvas></div>
-      <div class="card"><h3>🔢 Priority Breakdown</h3><canvas id="cP"></canvas></div>
-    </div>
-    ${tc.length?`<div class="card" style="margin-bottom:22px;"><h3>📂 Tickets by Category</h3><canvas id="cC" style="max-height:260px;"></canvas></div>`:''}
-  `;
+// ── Charts ────────────────────────────────────────────────────────────────
+var PCOLS=['#DC2626','#EA580C','#CA8A04','#16A34A','#2563EB','#7C3AED','#0891B2','#DB2777'];
+function barChart(data,color){
+  var max=Math.max.apply(null,data.map(function(d){return d.val;}));
+  if(!max)return '<div class="empty"><div class="ei">📊</div><p>No data</p></div>';
+  return '<div class="bar-chart">'+data.map(function(d){
+    var pct=Math.round(d.val/max*100);
+    return '<div class="bc-row"><span class="bc-lbl" title="'+d.label+'">'+d.label+'</span><div class="bc-track"><div class="bc-fill" style="width:'+pct+'%;background:'+(color||'#028090')+'"></div></div><span class="bc-val">'+d.val+'</span></div>';
+  }).join('')+'</div>';
+}
+function donutChart(data){
+  var total=data.reduce(function(s,d){return s+d.val;},0);
+  if(!total)return '<div class="empty"><div class="ei">📊</div><p>No data</p></div>';
+  var r=50,cx=60,cy=60,offset=0;
+  var arcs=data.map(function(d,i){
+    var frac=d.val/total,angle=frac*360,startAngle=offset,endAngle=offset+angle;
+    offset+=angle;
+    var s1=startAngle*Math.PI/180,e1=endAngle*Math.PI/180;
+    var x1=cx+r*Math.sin(s1),y1=cy-r*Math.cos(s1);
+    var x2=cx+r*Math.sin(e1),y2=cy-r*Math.cos(e1);
+    return {path:'M '+cx+' '+cy+' L '+x1+' '+y1+' A '+r+' '+r+' 0 '+(angle>180?1:0)+' 1 '+x2+' '+y2+' Z',color:PCOLS[i%PCOLS.length],label:d.label,val:d.val,pct:Math.round(frac*100)};
+  });
+  var svg='<svg viewBox="0 0 120 120" width="95" height="95" style="flex-shrink:0;">'+
+    arcs.map(function(a){return '<path d="'+a.path+'" fill="'+a.color+'" stroke="#fff" stroke-width="1.5"/>';}).join('')+
+    '<circle cx="'+cx+'" cy="'+cy+'" r="28" fill="#fff"/>'+
+    '<text x="'+cx+'" y="'+(cy+5)+'" text-anchor="middle" font-size="11" font-weight="700" fill="#0D1B2A">'+total+'</text></svg>';
+  var legend='<div class="donut-legend">'+arcs.map(function(a){
+    return '<div class="dl-row"><div class="dl-dot" style="background:'+a.color+'"></div><span class="dl-label">'+a.label+'</span><span class="dl-val">'+a.val+' ('+a.pct+'%)</span></div>';
+  }).join('')+'</div>';
+  return '<div class="donut-wrap">'+svg+legend+'</div>';
+}
 
-  requestAnimationFrame(()=>{
-    const pal=['#0891B2','#06B6D4','#0E7490','#22D3EE','#67E8F9','#A5F3FC','#BAE6FD','#7DD3FC','#38BDF8','#0EA5E9'];
-    if(mL.length)mk('cM',{type:'bar',data:{labels:mL,datasets:[{label:'Tickets',data:mD,backgroundColor:'#0891B2',borderRadius:5,borderSkipped:false}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'#F1F5F9'}},x:{grid:{display:false}}}}});
-    mk('cP',{type:'doughnut',data:{labels:['P1 Critical','P2 High','P3 Medium','P4 Low'],datasets:[{data:[bp.P1,bp.P2,bp.P3,bp.P4],backgroundColor:['#DC2626','#EA580C','#CA8A04','#16A34A'],borderWidth:3,borderColor:'#fff'}]},options:{plugins:{legend:{position:'right',labels:{font:{size:12},padding:14}}},cutout:'62%'}});
-    if(tc.length)mk('cC',{type:'bar',data:{labels:tc.map(x=>x[0]),datasets:[{label:'Tickets',data:tc.map(x=>x[1]),backgroundColor:pal,borderRadius:4}]},options:{indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,grid:{color:'#F1F5F9'}},y:{grid:{display:false}}}}});
+// ── SLA priority bars (from SLA file) ─────────────────────────────────────
+function renderSLABars(slaType, elId){
+  if(!SDATA){document.getElementById(elId).innerHTML='<div class="empty"><div class="ei">📤</div><p>Upload SLA data to see this</p></div>';return;}
+  var SC=fc(Object.keys(SDATA[0]));
+  var pb={P1:{y:0,n:0},P2:{y:0,n:0},P3:{y:0,n:0},P4:{y:0,n:0}};
+  SDATA.forEach(function(r){
+    // Filter by SLA type if column exists
+    if(SC.slatype){
+      var t=String(r[SC.slatype]||'').toLowerCase();
+      if(slaType==='Response'&&t!=='response')return;
+      if(slaType==='Resolution'&&t!=='resolution')return;
+    }
+    var p=mapP(r[SC.pri]);
+    if(!pb[p])return;
+    if(isMet(r[SC.slamet]))pb[p].y++;
+    else if(isBreached(r[SC.slamet]))pb[p].n++;
+  });
+  var defs=[
+    {key:'P1',label:'P1 / Sev A',color:'#DC2626',rt:slaType==='Response'?'15 min':'4 hrs'},
+    {key:'P2',label:'P2 / Sev B',color:'#EA580C',rt:slaType==='Response'?'1 hr':'12 hrs'},
+    {key:'P3',label:'P3 / Sev C',color:'#CA8A04',rt:slaType==='Response'?'4 hrs':'2 days'},
+    {key:'P4',label:'P4 / Low',  color:'#16A34A',rt:slaType==='Response'?'12 hrs':'10 days'}
+  ].filter(function(d){return pb[d.key].y+pb[d.key].n>0;});
+  if(!defs.length){document.getElementById(elId).innerHTML='<div class="empty"><div class="ei">ℹ️</div><p>No '+slaType.toLowerCase()+' SLA records found</p></div>';return;}
+  document.getElementById(elId).innerHTML=defs.map(function(d){
+    var tot=pb[d.key].y+pb[d.key].n,pct=Math.round(pb[d.key].y/tot*100),bc=slaColor(pct);
+    return '<div class="sla-bar-row">'+
+      '<span class="sla-lbl" style="color:'+d.color+'">'+d.label+'</span>'+
+      '<span class="sla-type">'+slaType+'</span>'+
+      '<span class="sla-target">Target: '+d.rt+'</span>'+
+      '<div class="sla-track"><div class="sla-fill" style="width:'+pct+'%;background:'+bc+'"></div></div>'+
+      '<span class="sla-pct" style="color:'+bc+'">'+pct+'%</span>'+
+      '<span class="sla-cnt">'+pb[d.key].y+'/'+tot+'</span>'+
+      '</div>';
+  }).join('');
+}
+
+// ── MAIN RENDER ───────────────────────────────────────────────────────────
+function renderAll(){
+  renderTickets();
+  renderSLATab();
+}
+
+function renderTickets(){
+  if(!TDATA)return;
+  var C=fc(Object.keys(TDATA[0]));
+  var p1=0,p2=0,open=0;
+  TDATA.forEach(function(r){
+    var p=mapP(r[C.pri]);
+    if(p==='P1')p1++;
+    if(p==='P2')p2++;
+    if(C.state&&!/clos|resolv|done/i.test(String(r[C.state]||'')))open++;
   });
 
-  /* ── SLA TAB ─────────────────────────────────────────── */
-  let sh='';
-  if(st){
-    const op=Math.round(sm/st*100),oc=op>=95?'var(--ok)':op>=85?'var(--am)':'var(--rd)';
-    sh+=`<div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:24px;"><div class="kpi ${op>=95?'ok':op>=85?'am':'rd'}"><div class="v" style="color:${oc}">${op}%</div><div class="l">Overall SLA Met</div><div class="s">${sm}/${st} events · target ≥95%</div></div></div>`;
-    sh+=`<div class="sh">SLA Met % by Priority vs SWO Targets</div><div class="pbwrap">`;
-    ['P1','P2','P3','P4'].forEach(p=>{
-      const {m,t}=sbp[p];if(!t)return;
-      const pct=Math.round(m/t*100),col=pct>=95?'#16A34A':pct>=80?'#D97706':'#DC2626';
-      sh+=`<div class="pb"><div class="pbtop"><span class="pbl" style="color:${SLA[p].col}">${p==='P1'?'P1 Critical':p==='P2'?'P2 High':p==='P3'?'P3 Medium':'P4 Low'}</span><span class="pbm">${m}/${t} met &nbsp;·&nbsp; Resp: ${p==='P1'?'≤15m':p==='P2'?'≤1hr':p==='P3'?'≤4hr':'≤12hr'} &nbsp;·&nbsp; Res: ${SLA[p].rl}</span></div><div class="pbtrack"><div class="pbfill" style="width:${pct}%;background:${col};"></div></div><div class="pbpct" style="color:${col}">${pct}% ${pct>=95?'✓':pct>=80?'⚠':'✗'}</div></div>`;
+  // Get overall SLA % from SLA file if loaded, else from ticket file
+  var slaPct=null;
+  if(SDATA){
+    var SC=fc(Object.keys(SDATA[0]));
+    var sy=0,sn=0;
+    SDATA.forEach(function(r){if(isMet(r[SC.slamet]))sy++;else if(isBreached(r[SC.slamet]))sn++;});
+    if(sy+sn>0)slaPct=Math.round(sy/(sy+sn)*100);
+    // Response vs resolution split
+    var ry=0,rn=0,ey=0,en=0;
+    SDATA.forEach(function(r){
+      var t=String(r[SC.slatype]||'').toLowerCase();
+      if(t==='response'){if(isMet(r[SC.slamet]))ry++;else if(isBreached(r[SC.slamet]))rn++;}
+      else if(t==='resolution'){if(isMet(r[SC.slamet]))ey++;else if(isBreached(r[SC.slamet]))en++;}
     });
-    sh+=`</div>`;
-    if(Object.keys(sbt).length){
-      sh+=`<div class="sh">SLA Met % by SLA Type</div><div class="pbwrap">`;
-      Object.entries(sbt).forEach(([ty,{m,t}])=>{if(!t)return;const pct=Math.round(m/t*100),col=pct>=95?'#16A34A':pct>=80?'#D97706':'#DC2626';sh+=`<div class="pb"><div class="pbtop"><span class="pbl">${ty}</span><span class="pbm">${m}/${t} met</span></div><div class="pbtrack"><div class="pbfill" style="width:${pct}%;background:${col};"></div></div><div class="pbpct" style="color:${col}">${pct}%</div></div>`;});
-      sh+=`</div>`;
-    }
-  }else{
-    sh+=`<div class="info">No <b>SLA Met</b> column found. If your export has SLA Met (Yes/No) values, charts will populate here. Ensure the column name contains 'sla met' or 'met'.</div>`;
+    var respPct=ry+rn>0?Math.round(ry/(ry+rn)*100):null;
+    var resPct=ey+en>0?Math.round(ey/(ey+en)*100):null;
+    if(respPct!==null){document.getElementById('k5').textContent=respPct+'%';document.getElementById('k5').closest('.kpi').className='kpi '+(respPct>=95?'g':respPct>=80?'a':'r');}
+    if(resPct!==null){document.getElementById('k6').textContent=resPct+'%';document.getElementById('k6').closest('.kpi').className='kpi '+(resPct>=95?'g':resPct>=80?'a':'r');}
   }
-  if(Object.keys(ar).length){
-    const mx=Math.max(...Object.values(ar),1);
-    sh+=`<div class="sh">Average Resolution Time by Priority</div><div class="pbwrap"><h3 style="color:var(--am);margin-bottom:14px;font-weight:500;">⚠️ Includes on-hold time — active resolution time is lower. Agree stop-clock method with Adecco at kickoff.</h3>`;
-    ['P1','P2','P3','P4'].forEach(p=>{
-      if(!ar[p])return;
-      const actual=ar[p],tgt=SLA[p].res,met=actual<=tgt,col=met?'#16A34A':'#DC2626',w=Math.min(100,Math.round(actual/mx*100));
-      sh+=`<div class="pb"><div class="pbtop"><span class="pbl" style="color:${SLA[p].col}">${p}</span><span class="pbm">Avg: <b>${actual.toFixed(1)} days</b> &nbsp;·&nbsp; Target: ${SLA[p].rl} &nbsp;·&nbsp; <span style="color:${col};font-weight:700;">${met?'✓ Within':'⚠ Review'}</span></span></div><div class="pbtrack"><div class="pbfill" style="width:${w}%;background:${col};"></div></div></div>`;
-    });
-    sh+=`</div>`;
-  }
-  document.getElementById('sl').innerHTML=sh||`<div class="info">No SLA data found in this export.</div>`;
 
-  /* ── TICKETS TAB ─────────────────────────────────────── */
-  const srt=[...rows].sort((a,b)=>({P1:0,P2:1,P3:2,P4:3}[a._P]||3)-({P1:0,P2:1,P3:2,P4:3}[b._P]||3));
-  const dk=keys.filter(k=>!k.startsWith('_'));
-  document.getElementById('tx').innerHTML=`
-    <div class="kgrid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-bottom:22px;">
-      <div class="kpi"><div class="v">${tot}</div><div class="l">Total</div></div>
-      <div class="kpi rd"><div class="v">${bp.P1}</div><div class="l">P1 Critical</div></div>
-      <div class="kpi am"><div class="v">${bp.P2}</div><div class="l">P2 High</div></div>
-      <div class="kpi ok"><div class="v">${cl}</div><div class="l">Closed</div></div>
-      <div class="kpi am"><div class="v">${ho}</div><div class="l">On Hold</div></div>
-      <div class="kpi nt"><div class="v">${op}</div><div class="l">Active/Open</div></div>
-    </div>
-    <div class="tblwrap"><table>
-      <thead><tr>${dk.map(k=>`<th>${k}</th>`).join('')}</tr></thead>
-      <tbody>${srt.map(row=>`<tr>${dk.map(k=>{
-        const v=row[k];
-        if(k===C.pri)return`<td>${pp(row._P)}</td>`;
-        if(k===C.state)return`<td>${sp(v)}</td>`;
-        if(k===C.smet)return`<td>${slp(v)}</td>`;
-        const s=String(v||'');if(s.length>90)return`<td title="${s.replace(/"/g,"'")}">${s.slice(0,88)}…</td>`;
-        return`<td>${s}</td>`;
-      }).join('')}</tr>`).join('')}</tbody>
-    </table></div>`;
+  document.getElementById('k0').textContent=TDATA.length;
+  document.getElementById('k1').textContent=p1;
+  document.getElementById('k2').textContent=p2;
+  document.getElementById('k3').textContent=C.state?open:'—';
+  if(slaPct!==null){document.getElementById('k4').textContent=slaPct+'%';document.getElementById('k4').closest('.kpi').className='kpi '+(slaPct>=95?'g':slaPct>=80?'a':'r');}
+
+  // Priority donut
+  var pm={P1:0,P2:0,P3:0,P4:0};
+  TDATA.forEach(function(r){var p=mapP(r[C.pri]);if(pm[p]!==undefined)pm[p]++;});
+  var priData=[{label:'P1 Sev A',val:pm.P1,c:'#DC2626'},{label:'P2 Sev B',val:pm.P2,c:'#EA580C'},{label:'P3 Sev C',val:pm.P3,c:'#CA8A04'},{label:'P4 Low',val:pm.P4,c:'#16A34A'}].filter(function(d){return d.val>0;});
+  document.getElementById('priChart').innerHTML=donutChart(priData);
+
+  // State donut
+  if(C.state){
+    var sm={};
+    TDATA.forEach(function(r){var v=String(r[C.state]||'Other').trim();sm[v]=(sm[v]||0)+1;});
+    document.getElementById('stateChart').innerHTML=donutChart(Object.keys(sm).map(function(k){return {label:k,val:sm[k]};}));
+  }
+
+  // Category bar
+  if(C.cat){
+    var cm={};
+    TDATA.forEach(function(r){var v=String(r[C.cat]||'').trim();if(v)cm[v]=(cm[v]||0)+1;});
+    var catData=Object.keys(cm).sort(function(a,b){return cm[b]-cm[a];}).slice(0,8).map(function(k){return {label:k,val:cm[k]};});
+    document.getElementById('catChart').innerHTML=barChart(catData,'#028090');
+  }
+
+  // Weekly bar
+  if(C.created){
+    var wm={};
+    TDATA.forEach(function(r){
+      var d=new Date(r[C.created]);if(isNaN(d))return;
+      var dy=d.getDay(),mon=new Date(d);mon.setDate(d.getDate()+(dy===0?-6:1-dy));
+      var wk=mon.toLocaleDateString('en-GB',{day:'2-digit',month:'short'});
+      wm[wk]=(wm[wk]||0)+1;
+    });
+    if(Object.keys(wm).length)document.getElementById('wkChart').innerHTML=barChart(Object.keys(wm).map(function(k){return {label:'w/c '+k,val:wm[k]};}), '#00B4CC');
+  }
+
+  // Tickets table
+  var SHOW=[C.num,C.pri,C.state,C.cat,C.resdays,C.created].filter(Boolean);
+  var LBL={};if(C.num)LBL[C.num]='Ticket';if(C.pri)LBL[C.pri]='Priority';if(C.state)LBL[C.state]='State';if(C.cat)LBL[C.cat]='Category';if(C.resdays)LBL[C.resdays]='Res. Time';if(C.created)LBL[C.created]='Created';
+
+  // Add SLA Met column from SLA file if available
+  var slaMap={};
+  if(SDATA){
+    var SC2=fc(Object.keys(SDATA[0]));
+    SDATA.forEach(function(r){
+      var tn=r[SC2.num];
+      if(!slaMap[tn])slaMap[tn]={resp:null,res:null};
+      var t=String(r[SC2.slatype]||'').toLowerCase();
+      if(t==='response')slaMap[tn].resp=r[SC2.slamet];
+      else if(t==='resolution')slaMap[tn].res=r[SC2.slamet];
+    });
+  }
+
+  var closed=TDATA.filter(function(r){return C.state&&/clos|resolv|done/i.test(String(r[C.state]||''));}).length;
+  document.getElementById('tkStats').style.display='grid';
+  document.getElementById('tkStats').innerHTML=[
+    {v:TDATA.length,l:'Total',s:'All tickets',c:''},{v:p1,l:'P1 Sev A',s:'Critical',c:'r'},
+    {v:open,l:'Open',s:'Not closed',c:'a'},{v:closed,l:'Closed',s:'Resolved',c:'g'}
+  ].map(function(i){return '<div class="kpi '+i.c+'"><div class="kpi-val">'+i.v+'</div><div class="kpi-lbl">'+i.l+'</div><div class="kpi-sub">'+i.s+'</div></div>';}).join('');
+
+  var hasSLA=Object.keys(slaMap).length>0;
+  var thead='<thead><tr>'+SHOW.map(function(k){return '<th>'+(LBL[k]||k)+'</th>';}).join('')+(hasSLA?'<th>Resp SLA</th><th>Res SLA</th>':'')+'</tr></thead>';
+  var tbody='<tbody>'+TDATA.map(function(row){
+    var tn=C.num?row[C.num]:'';
+    var sla=slaMap[tn]||{resp:null,res:null};
+    return '<tr>'+SHOW.map(function(k){
+      var v=row[k],kl=k.toLowerCase();
+      if(/prior|sev/.test(kl))return '<td>'+priPill(v)+'</td>';
+      if(/state|status/.test(kl))return '<td>'+stPill(v)+'</td>';
+      if(/creat|date/.test(kl)){var dd=new Date(v);return '<td style="color:#64748B;font-family:Courier New,monospace;font-size:.74rem;">'+(isNaN(dd)?v:dd.toLocaleDateString('en-GB'))+'</td>';}
+      if(/resol/.test(kl)&&v){var rv=parseFloat(v);return '<td style="font-family:Courier New,monospace;">'+(isNaN(rv)?v:rv.toFixed(1)+' d')+'</td>';}
+      return '<td>'+(v||'—')+'</td>';
+    }).join('')+(hasSLA?'<td>'+(sla.resp!==null?slaPill(sla.resp):'<span class="pill pgr">—</span>')+'</td><td>'+(sla.res!==null?slaPill(sla.res):'<span class="pill pgr">—</span>')+'</td>':'')+'</tr>';
+  }).join('')+'</tbody>';
+  document.getElementById('tkWrap').innerHTML='<table>'+thead+tbody+'</table>';
 }
 
-function reset(){
-  document.getElementById('uz').style.display='';
-  document.getElementById('ov').innerHTML=`<div class="empty"><div class="ei">📈</div><h3>No data loaded</h3><p>Upload a ticket export above.</p></div>`;
-  document.getElementById('sl').innerHTML=`<div class="empty"><div class="ei">🎯</div><h3>Awaiting data</h3><p>Upload a ticket export on the Overview tab.</p></div>`;
-  document.getElementById('tx').innerHTML=`<div class="empty"><div class="ei">🎫</div><h3>Awaiting data</h3><p>Upload a ticket export on the Overview tab.</p></div>`;
-  document.getElementById('fi').value='';
-  Object.values(CH).forEach(c=>c.destroy());
+function renderSLATab(){
+  if(!SDATA){return;}
+  var SC=fc(Object.keys(SDATA[0]));
+
+  // Top stats
+  var ry=0,rn=0,ey=0,en=0,ay=0,an=0;
+  SDATA.forEach(function(r){
+    var t=String(r[SC.slatype]||'').toLowerCase(),m=isMet(r[SC.slamet]),b=isBreached(r[SC.slamet]);
+    if(m)ay++;else if(b)an++;
+    if(t==='response'){if(m)ry++;else if(b)rn++;}
+    else if(t==='resolution'){if(m)ey++;else if(b)en++;}
+  });
+  function pct(y,n){return y+n>0?Math.round(y/(y+n)*100):null;}
+  function setEl(id,val){
+    var el=document.getElementById(id);
+    if(val===null){el.textContent='—';el.style.color='#028090';return;}
+    el.textContent=val+'%';el.style.color=slaColor(val);
+  }
+  setEl('sl0',pct(ry,rn));setEl('sl1',pct(ey,en));setEl('sl2',pct(ay,an));
+  // Sync to overview KPIs
+  if(pct(ry,rn)!==null){document.getElementById('k5').textContent=pct(ry,rn)+'%';}
+  if(pct(ey,en)!==null){document.getElementById('k6').textContent=pct(ey,en)+'%';}
+  if(pct(ay,an)!==null){document.getElementById('k4').textContent=pct(ay,an)+'%';}
+
+  renderSLABars('Response','slaRespBars');
+  renderSLABars('Resolution','slaResBars');
+
+  // Breach table
+  var breaches=SDATA.filter(function(r){return isBreached(r[SC.slamet]);});
+  if(breaches.length){
+    document.getElementById('breachBody').innerHTML=breaches.map(function(r){
+      var rd=parseFloat(r[SC.resdays]);
+      return '<tr>'+
+        '<td style="font-family:Courier New,monospace;font-size:.74rem;">'+(r[SC.num]||'—')+'</td>'+
+        '<td>'+priPill(r[SC.pri])+'</td>'+
+        '<td><span class="pill pteal">'+(r[SC.slatype]||'—')+'</span></td>'+
+        '<td style="color:#64748B;">'+(r[SC.cat]||'—')+'</td>'+
+        '<td style="font-family:Courier New,monospace;font-weight:700;color:#DC2626;">'+(isNaN(rd)?'—':rd.toFixed(1)+' d')+'</td>'+
+        '<td><span class="pill pr">Breached</span></td></tr>';
+    }).join('');
+  } else {
+    document.getElementById('breachBody').innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">✅</div><p>No SLA breaches in this dataset</p></div></td></tr>';
+  }
 }
 </script>
 </body>
